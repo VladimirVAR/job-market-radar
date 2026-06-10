@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: mart_job_market_overview
+    description: >
+      High-level KPI mart for the dashboard Overview page. Grain: one row for the current market snapshot.
+    columns:
+      - name: overview_key
+        description: Constant primary display key for the current market snapshot row.
+        tests:
+          - not_null
+          - unique
+      - name: total_current_job_postings
+        description: Count of current-state job postings.
+        tests:
+          - not_null
+      - name: active_job_count
+        description: Count of active job postings.
+        tests:
+          - not_null
+      - name: distinct_companies
+        description: Number of distinct non-unknown companies.
+        tests:
+          - not_null
+      - name: distinct_locations
+        description: Number of distinct non-unknown location buckets.
+        tests:
+          - not_null
+      - name: latest_last_seen_at
+        description: Most recent last_seen_at timestamp in current jobs.
+      - name: relevant_job_count
+        description: Active jobs with relevance_score >= 60.
+        tests:
+          - not_null
+      - name: high_match_job_count
+        description: Active jobs with relevance_score >= 80.
+        tests:
+          - not_null
+      - name: junior_friendly_job_count
+        description: Active jobs marked as junior-friendly.
+        tests:
+          - not_null

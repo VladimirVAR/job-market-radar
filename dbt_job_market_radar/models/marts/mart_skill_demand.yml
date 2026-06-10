@@ -1,0 +1,31 @@
+version: 2
+
+models:
+  - name: mart_skill_demand
+    description: >
+      Skill demand mart for the Skill Radar dashboard page. Grain: one row per MVP skill.
+      Uses transparent rule-based matching over job title and description fields.
+    columns:
+      - name: skill_name
+        description: Normalized skill display name.
+        tests:
+          - not_null
+          - unique
+      - name: skill_category
+        description: Skill category used for grouping in the dashboard.
+        tests:
+          - not_null
+      - name: matching_job_count
+        description: Number of active current jobs mentioning this skill.
+        tests:
+          - not_null
+      - name: total_job_count
+        description: Total number of active current jobs used as denominator.
+        tests:
+          - not_null
+      - name: share_of_jobs
+        description: matching_job_count divided by total_job_count.
+        tests:
+          - not_null
+      - name: last_seen_at
+        description: Latest last_seen_at among jobs mentioning this skill.

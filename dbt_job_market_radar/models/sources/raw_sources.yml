@@ -1,0 +1,154 @@
+version: 2
+
+sources:
+  - name: raw
+    description: >
+      Raw PostgreSQL schema loaded by Python ingestion. dbt reads these tables
+      with source() and builds staging, warehouse, and marts models downstream.
+    database: "{{ env_var('POSTGRES_DB', 'job_market_radar') }}"
+    schema: raw
+    tables:
+      - name: raw_load_batches
+        description: One row per pipeline execution / ingestion batch.
+        columns:
+          - name: batch_id
+            description: Unique pipeline run identifier.
+            tests:
+              - not_null
+              - unique
+          - name: source_name
+            description: Source system name, for example france_travail.
+            tests:
+              - not_null
+          - name: pipeline_name
+            description: Name of the pipeline that created the batch.
+          - name: started_at
+            description: Pipeline start timestamp.
+            tests:
+              - not_null
+          - name: finished_at
+            description: Pipeline finish timestamp. Null while batch is running or failed before completion.
+          - name: status
+            description: Batch status.
+            tests:
+              - not_null
+              - accepted_values:
+                  arguments:
+                    values: ['running', 'success', 'failed', 'partial_success']
+          - name: triggered_by
+            description: Trigger source, for example manual or airflow.
+          - name: records_loaded
+            description: Number of raw job records loaded during the batch.
+          - name: requests_made
+            description: Number of API requests made during the batch.
+          - name: error_message
+            description: Error message if the batch failed.
+          - name: created_at
+            description: Metadata creation timestamp.
+
+      - name: raw_api_requests
+        description: One row per API request, page, or search parameter set.
+        columns:
+          - name: request_id
+            description: Unique API request identifier.
+            tests:
+              - not_null
+              - unique
+          - name: batch_id
+            description: Related load batch.
+            tests:
+              - not_null
+              - relationships:
+                  arguments:
+                    to: source('raw', 'raw_load_batches')
+                    field: batch_id
+          - name: source_name
+            description: Source system name.
+            tests:
+              - not_null
+          - name: endpoint
+            description: API endpoint without secrets.
+          - name: http_method
+            description: HTTP method used for the request.
+          - name: request_url
+            description: Full request URL if safe to store.
+          - name: request_params_json
+            description: Request parameters stored as JSONB.
+          - name: search_scope_key
+            description: Comparable search scope identifier.
+            tests:
+              - not_null
+          - name: page_number
+            description: API page number when pagination is used.
+          - name: page_size
+            description: Requested page size when pagination is used.
+          - name: response_status_code
+            description: HTTP response status code.
+          - name: response_time_ms
+            description: Request duration in milliseconds.
+          - name: response_headers_json
+            description: Response headers stored as JSONB, excluding secrets.
+          - name: started_at
+            description: Request start timestamp.
+          - name: finished_at
+            description: Request finish timestamp.
+          - name: error_message
+            description: Error message if the request failed.
+          - name: created_at
+            description: Metadata creation timestamp.
+
+      - name: raw_france_travail_job_postings
+        description: One raw France Travail job posting payload per source job per request per batch.
+        columns:
+          - name: raw_job_posting_id
+            description: Unique raw row identifier.
+            tests:
+              - not_null
+              - unique
+          - name: batch_id
+            description: Related load batch.
+            tests:
+              - not_null
+              - relationships:
+                  arguments:
+                    to: source('raw', 'raw_load_batches')
+                    field: batch_id
+          - name: request_id
+            description: Related API request.
+            tests:
+              - not_null
+              - relationships:
+                  arguments:
+                    to: source('raw', 'raw_api_requests')
+                    field: request_id
+          - name: source_name
+            description: Source system name. Should be france_travail for this table.
+            tests:
+              - not_null
+              - accepted_values:
+                  arguments:
+                    values: ['france_travail']
+          - name: source_job_id
+            description: Source-specific job identifier from France Travail.
+            tests:
+              - not_null
+          - name: source_job_key
+            description: Stable source-level key, for example france_travail:{source_job_id}.
+            tests:
+              - not_null
+          - name: search_scope_key
+            description: Comparable search scope that returned the job.
+            tests:
+              - not_null
+          - name: raw_payload_json
+            description: Full raw API job payload stored as JSONB.
+            tests:
+              - not_null
+          - name: payload_hash
+            description: Stable hash of the raw payload for change detection.
+            tests:
+              - not_null
+          - name: ingested_at
+            description: Timestamp when the raw row was ingested.
+          - name: created_at
+            description: Metadata creation timestamp.

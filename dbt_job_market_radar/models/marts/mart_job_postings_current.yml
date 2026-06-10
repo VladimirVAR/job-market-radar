@@ -1,0 +1,62 @@
+version: 2
+
+models:
+  - name: mart_job_postings_current
+    description: >
+      Dashboard-ready current job postings mart. Grain: one row per current source_job_key / canonical_job_key.
+      Includes simple MVP relevance scoring, detected skills, junior-friendly flag, and display fields.
+    columns:
+      - name: canonical_job_key
+        description: Stable canonical job identifier. In the MVP, this is equivalent to source_job_key.
+        tests:
+          - not_null
+          - unique
+      - name: source_job_key
+        description: Stable source-level job key.
+        tests:
+          - not_null
+      - name: source_name
+        description: Source system name, for example france_travail.
+        tests:
+          - not_null
+      - name: job_title
+        description: Current job title.
+      - name: company_name
+        description: Company display name, with missing values grouped as unknown.
+        tests:
+          - not_null
+      - name: city
+        description: City display value, with missing values grouped as unknown.
+        tests:
+          - not_null
+      - name: is_active
+        description: Whether the job is active in the latest comparable current-state logic.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [true, false]
+                quote: false
+      - name: relevance_score
+        description: Explainable MVP relevance score from 0 to 100.
+        tests:
+          - not_null
+      - name: relevance_bucket
+        description: Score bucket for dashboard filtering.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['high_match', 'good_match', 'weak_match', 'low_match']
+      - name: is_junior_friendly
+        description: Boolean flag indicating whether the posting appears junior/career-switcher friendly.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [true, false]
+                quote: false
+      - name: relevance_reason
+        description: Human-readable explanation of the relevance signal.
+      - name: payload_hash
+        description: Latest source payload hash for lineage/debugging.

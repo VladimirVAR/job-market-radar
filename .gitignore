@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# Environment
+.env
+*.env
+!.env.example
+
+# dbt
+dbt_job_market_radar/target/
+dbt_job_market_radar/dbt_packages/
+dbt_job_market_radar/logs/
+dbt_job_market_radar/profiles.yml
+
+# Airflow
+airflow/logs/
+airflow/*.db
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/
+
+# Data outputs
+data/raw/
+data/output/
+reports/generated/

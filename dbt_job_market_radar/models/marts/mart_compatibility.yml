@@ -1,0 +1,175 @@
+version: 2
+
+models:
+  - name: mart_relevant_jobs
+    description: >
+      Compatibility mart for Streamlit Task 011 naming. Grain: one active current job posting enriched with relevance score
+      and Candidate Fit Score v1 for a junior / career-switching Data Engineer candidate in France / Europe.
+    columns:
+      - name: canonical_job_key
+        description: Stable canonical job key. In the MVP this maps to the source job key.
+        tests:
+          - not_null
+          - unique
+      - name: source_job_key
+        description: Source-level stable job key.
+      - name: source_name
+        description: Source system name.
+      - name: job_title
+        description: Latest job title shown in the dashboard.
+      - name: company_name
+        description: Company name, using an unknown bucket upstream when missing.
+      - name: city
+        description: City bucket, using an unknown bucket upstream when missing.
+      - name: contract_type
+        description: Normalized contract type if available.
+      - name: work_mode
+        description: Normalized workplace mode if available.
+      - name: seniority_level
+        description: Inferred seniority level from upstream parsing when available.
+      - name: matched_candidate_skills
+        description: Candidate Profile v1 skills detected in the job posting.
+      - name: missing_growth_skills
+        description: Growth skills detected in the posting that are not treated as current candidate strengths.
+      - name: relevance_score
+        description: Existing generic relevance score kept for backwards compatibility.
+        tests:
+          - not_null
+      - name: relevance_bucket
+        description: Existing generic relevance bucket kept for backwards compatibility.
+      - name: is_junior_friendly
+        description: Existing junior-friendly flag from the MVP relevance logic.
+        tests:
+          - not_null
+      - name: role_fit_score
+        description: Candidate Fit Score component. Measures whether the role is a strong target or acceptable adjacent role.
+        tests:
+          - not_null
+      - name: skill_fit_score
+        description: Candidate Fit Score component. Measures detected overlap with Candidate Profile v1 current skills.
+        tests:
+          - not_null
+      - name: seniority_fit_score
+        description: Candidate Fit Score component. Rewards junior/unknown/moderate seniority and penalizes seniority risk.
+        tests:
+          - not_null
+      - name: contract_fit_score
+        description: Candidate Fit Score component. Rewards candidate-friendly contract types and lowers freelance/expert missions.
+        tests:
+          - not_null
+      - name: location_fit_score
+        description: Candidate Fit Score component. Rewards France / practical location / remote-hybrid context.
+        tests:
+          - not_null
+      - name: growth_value_score
+        description: Candidate Fit Score component. Small positive signal for growth skills that are useful learning signals.
+        tests:
+          - not_null
+      - name: negative_signal_penalty
+        description: Candidate Fit Score penalty for seniority risk, low role fit, freelance/expert contracts, or missing core skills.
+        tests:
+          - not_null
+      - name: candidate_fit_score
+        description: >
+          Candidate-specific score from 0 to 100. It is rule-based and explainable. It is not a machine learning recommender.
+        tests:
+          - not_null
+      - name: candidate_fit_band
+        description: Candidate Fit Score band used for dashboard filtering.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['strong_match', 'good_match', 'possible_match', 'weak_match', 'low_priority']
+      - name: application_priority
+        description: Practical application label for the candidate.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['apply_now', 'good_candidate', 'stretch_opportunity', 'learning_signal', 'low_priority']
+      - name: positive_reason_codes
+        description: Deterministic positive reason codes explaining why the job may fit the candidate.
+      - name: negative_reason_codes
+        description: Deterministic negative reason codes explaining risk or low-priority signals.
+      - name: candidate_fit_reason
+        description: Short human-readable Candidate Fit Score explanation for Streamlit and reports.
+        tests:
+          - not_null
+      - name: is_strong_target_role
+        description: True when the job appears to be a strong Data Engineering / ETL / Analytics Engineering target role.
+        tests:
+          - not_null
+      - name: is_acceptable_adjacent_role
+        description: True when the job appears adjacent but potentially useful, such as BI Developer or SQL/Data Analyst.
+        tests:
+          - not_null
+      - name: is_seniority_risk
+        description: True when senior/lead/architect/expert or high-experience signals are detected.
+        tests:
+          - not_null
+      - name: is_stretch_opportunity
+        description: True when the job may be worth manual review despite seniority or growth-skill gaps.
+        tests:
+          - not_null
+      - name: is_learning_signal
+        description: True when the posting is useful mainly for tracking demanded growth skills rather than immediate application.
+        tests:
+          - not_null
+
+  - name: mart_missing_skills
+    description: >
+      Compatibility mart for Streamlit Task 011 naming. Grain: one missing/growth skill in relevant current jobs.
+    columns:
+      - name: skill_name
+        tests:
+          - not_null
+          - unique
+      - name: job_count
+        tests:
+          - not_null
+      - name: priority_level
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['learn_next', 'important', 'monitor']
+
+  - name: mart_location_activity
+    description: >
+      Compatibility mart for Streamlit Task 011 naming. Grain: one location bucket for the current market snapshot.
+    columns:
+      - name: location_name
+        tests:
+          - not_null
+          - unique
+      - name: active_job_count
+        tests:
+          - not_null
+
+  - name: mart_company_activity
+    description: >
+      Compatibility mart for Streamlit Task 011 naming. Grain: one company bucket for the current market snapshot.
+    columns:
+      - name: company_name
+        tests:
+          - not_null
+          - unique
+      - name: active_job_count
+        tests:
+          - not_null
+
+  - name: mart_weekly_market_summary
+    description: >
+      Lightweight weekly market summary mart for dashboard/report consumption. Grain: one row for the current reporting week.
+    columns:
+      - name: week_start_date
+        tests:
+          - not_null
+          - unique
+      - name: summary_text
+        tests:
+          - not_null
+      - name: has_enough_history
+        tests:
+          - not_null

@@ -1,0 +1,38 @@
+name: job_market_radar
+version: '1.0.0'
+config-version: 2
+
+profile: job_market_radar
+
+model-paths: ['models']
+analysis-paths: ['analyses']
+test-paths: ['tests']
+seed-paths: ['seeds']
+macro-paths: ['macros']
+snapshot-paths: ['snapshots']
+
+target-path: 'target'
+clean-targets:
+  - 'target'
+  - 'dbt_packages'
+
+models:
+  job_market_radar:
+    staging:
+      +schema: staging
+      +materialized: view
+      +tags: ['staging']
+      france_travail:
+        +tags: ['staging', 'france_travail']
+    warehouse:
+      +schema: warehouse
+      +materialized: table
+      +tags: ['warehouse']
+    marts:
+      +schema: marts
+      +materialized: table
+      +tags: ['marts']
+
+tests:
+  job_market_radar:
+    +store_failures: false

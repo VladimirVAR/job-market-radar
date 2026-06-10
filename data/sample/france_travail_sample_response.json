@@ -1,0 +1,22 @@
+{
+  "resultats": [
+    {
+      "id": "SAMPLE001",
+      "intitule": "Data Engineer Junior",
+      "description": "Build SQL and Python pipelines with PostgreSQL and dbt.",
+      "entreprise": {"nom": "Sample Data Company"},
+      "lieuTravail": {"libelle": "Paris 75"},
+      "typeContrat": "CDI",
+      "origineOffre": {"urlOrigine": "https://example.com/jobs/SAMPLE001"}
+    },
+    {
+      "id": "SAMPLE002",
+      "intitule": "Analytics Engineer",
+      "description": "Work with SQL, dbt, Airflow, and dashboard-ready marts.",
+      "entreprise": {"nom": "Sample Analytics Studio"},
+      "lieuTravail": {"libelle": "Lyon 69"},
+      "typeContrat": "CDD",
+      "origineOffre": {"urlOrigine": "https://example.com/jobs/SAMPLE002"}
+    }
+  ]
+}

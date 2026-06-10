@@ -1,0 +1,125 @@
+version: 2
+
+models:
+  - name: wh_job_posting_snapshots
+    description: >
+      Warehouse historical observation model for France Travail job postings.
+      Grain: one row per raw job posting observation, identified by raw_job_posting_id.
+      This is not a dbt snapshot object; it is a warehouse SQL model that preserves
+      one ingested observation per raw row and keeps lineage back to raw ingestion.
+      The model depends on ref('stg_france_travail_job_postings') and does not read
+      raw tables directly.
+    columns:
+      - name: snapshot_id
+        description: "Warehouse snapshot identifier. In MVP this equals raw_job_posting_id."
+        tests:
+          - not_null
+          - unique
+
+      - name: job_snapshot_id
+        description: "Alias for snapshot_id kept for compatibility with warehouse naming conventions."
+
+      - name: raw_job_posting_id
+        description: "Raw layer job posting row identifier; preserves lineage back to raw.raw_france_travail_job_postings."
+        tests:
+          - not_null
+          - unique
+
+      - name: batch_id
+        description: "Load batch that produced this observation."
+        tests:
+          - not_null
+
+      - name: request_id
+        description: "API request/page/search parameter set that produced this observation."
+        tests:
+          - not_null
+
+      - name: source_name
+        description: "Source system name. For this MVP model the expected value is france_travail."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['france_travail']
+
+      - name: source_job_id
+        description: "Source-specific job identifier from France Travail."
+        tests:
+          - not_null
+
+      - name: source_job_key
+        description: "Stable source-level key, for example france_travail:{source_job_id}."
+        tests:
+          - not_null
+
+      - name: canonical_job_key
+        description: "Canonical job key. In MVP this equals source_job_key; future sources may require cross-source matching."
+
+      - name: search_scope_key
+        description: "Comparable search scope that returned this job posting. Required for future inactive/disappeared job logic."
+
+      - name: job_title
+        description: "Job title parsed in staging from the France Travail raw payload. Nullable if source payload omits it."
+
+      - name: normalized_job_title
+        description: "Lightly normalized job title for future grouping and matching."
+
+      - name: company_name
+        description: "Company name parsed in staging from the France Travail raw payload. Nullable if source payload omits it."
+
+      - name: company_key
+        description: "Lightly normalized company key for warehouse-level grouping."
+
+      - name: location_raw
+        description: "Raw location text parsed in staging from the source payload."
+
+      - name: location_key
+        description: "Lightly normalized location key based on city, location_raw, or an unknown fallback."
+
+      - name: city
+        description: "Best-effort city parsed by the staging layer. Nullable if unavailable."
+
+      - name: region
+        description: "Best-effort region parsed by the staging layer. Nullable if unavailable."
+
+      - name: country
+        description: "Country parsed or defaulted by the staging layer."
+
+      - name: contract_type
+        description: "Contract type parsed or normalized by the staging layer."
+
+      - name: work_mode
+        description: "Work mode parsed or inferred by the staging layer."
+
+      - name: seniority_level
+        description: "Seniority signal parsed or inferred by the staging layer. Not used for relevance scoring in this task."
+
+      - name: description_text
+        description: "Job description text parsed by staging. Used by later skill extraction tasks, not in Task 008."
+
+      - name: published_at
+        description: "Source publication timestamp when available."
+
+      - name: updated_at
+        description: "Source update timestamp when available."
+
+      - name: retrieved_at
+        description: "Ingestion/retrieval timestamp carried from staging. Used as the observation timestamp."
+
+      - name: source_url
+        description: "Original job posting URL when available."
+
+      - name: payload_hash
+        description: "Hash of the raw payload, used for change detection and lineage."
+        tests:
+          - not_null
+
+      - name: is_seen_in_batch
+        description: "True for rows observed in the batch. Missing/inactive logic is not implemented in Task 008."
+
+      - name: snapshot_loaded_at
+        description: "Observation timestamp for this warehouse snapshot. Uses retrieved_at for deterministic source-based timing."
+
+      - name: created_at
+        description: "Timestamp when the warehouse model row was produced by dbt."

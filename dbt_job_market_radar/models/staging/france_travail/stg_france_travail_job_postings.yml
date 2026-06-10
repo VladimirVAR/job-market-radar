@@ -1,0 +1,139 @@
+version: 2
+
+models:
+  - name: stg_france_travail_job_postings
+    description: >
+      Cleaned source-specific staging model for France Travail job postings.
+      Grain: one row per raw.raw_france_travail_job_postings.raw_job_posting_id.
+      This model parses selected fields from raw_payload_json and preserves
+      lineage columns required by downstream warehouse models.
+    columns:
+      - name: raw_job_posting_id
+        description: >
+          Unique raw job posting row identifier. Preserved from the raw layer
+          to keep staging rows traceable back to the original raw payload.
+        tests:
+          - not_null
+          - unique
+
+      - name: batch_id
+        description: >
+          Load batch identifier for the pipeline run that ingested this job
+          posting. Required for lineage and batch-aware warehouse models.
+        tests:
+          - not_null
+
+      - name: request_id
+        description: >
+          API request identifier that produced this raw job posting.
+          Required for request-level lineage and debugging.
+        tests:
+          - not_null
+
+      - name: source_name
+        description: >
+          Source system name. For this staging model, the expected value is
+          france_travail.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['france_travail']
+
+      - name: source_job_id
+        description: >
+          Job identifier from the France Travail API.
+        tests:
+          - not_null
+
+      - name: source_job_key
+        description: >
+          Stable source-level job key generated during ingestion, for example
+          france_travail:{source_job_id}. This key is carried downstream and
+          becomes the MVP canonical job key in warehouse models.
+        tests:
+          - not_null
+
+      - name: search_scope_key
+        description: >
+          Comparable search scope that returned this job posting. This is needed
+          later for snapshot/current-state logic and inactive-job analysis.
+        tests:
+          - not_null
+
+      - name: job_title
+        description: >
+          Job title parsed from raw_payload_json ->> 'intitule'. Nullable only if
+          the source payload is missing the field.
+
+      - name: company_name
+        description: >
+          Company name parsed from raw_payload_json -> 'entreprise' ->> 'nom'.
+          Nullable because France Travail payloads may omit company information.
+
+      - name: location_raw
+        description: >
+          Original location text parsed from lieuTravail fields, preferably
+          raw_payload_json -> 'lieuTravail' ->> 'libelle'.
+
+      - name: city
+        description: >
+          Best-effort city value from lieuTravail fields. If no explicit city
+          field exists, this model attempts to derive it from location_raw.
+
+      - name: region
+        description: >
+          Region value. Currently null because the raw France Travail payload may
+          not provide a reliable region field in the MVP sample.
+
+      - name: country
+        description: >
+          Country value. Defaults to France when no explicit country is present
+          in the France Travail payload.
+
+      - name: contract_type
+        description: >
+          Contract type parsed from typeContrat or typeContratLibelle.
+          Kept as a source-specific staging value for later warehouse modeling.
+
+      - name: work_mode
+        description: >
+          Lightly classified work mode derived from the teletravail field.
+          Expected staging values are remote, hybrid, on_site, or unknown.
+
+      - name: seniority_level
+        description: >
+          Lightly classified seniority level from France Travail experience
+          fields. Expected staging values are junior, senior, or unknown in this
+          MVP staging model.
+
+      - name: description_text
+        description: >
+          Job description parsed from raw_payload_json ->> 'description'.
+          This text will later support skill extraction in warehouse models.
+
+      - name: published_at
+        description: >
+          Publication timestamp parsed from raw_payload_json ->> 'dateCreation'
+          when it looks like an ISO date or timestamp.
+
+      - name: updated_at
+        description: >
+          Last update timestamp parsed from raw_payload_json ->> 'dateActualisation'
+          when it looks like an ISO date or timestamp.
+
+      - name: retrieved_at
+        description: >
+          Technical ingestion timestamp preserved from raw.ingested_at.
+
+      - name: source_url
+        description: >
+          Source posting URL parsed from origineOffre.urlOrigine, urlOrigine,
+          or url when available.
+
+      - name: payload_hash
+        description: >
+          Stable hash of the raw payload generated during ingestion. Used later
+          for change detection and lineage validation.
+        tests:
+          - not_null

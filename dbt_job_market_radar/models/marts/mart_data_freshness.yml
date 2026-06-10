@@ -1,0 +1,29 @@
+version: 2
+
+models:
+  - name: mart_data_freshness
+    description: >
+      Data freshness mart for the dashboard Data Freshness page. Grain: one row per source_name.
+      Uses raw batch/request metadata plus warehouse row counts for operational observability.
+    columns:
+      - name: source_name
+        description: Source system name.
+        tests:
+          - not_null
+          - unique
+      - name: latest_successful_batch_id
+        description: Most recent successful load batch for the source.
+      - name: latest_successful_batch_started_at
+        description: Started timestamp for the latest successful batch.
+      - name: latest_successful_batch_finished_at
+        description: Finished timestamp for the latest successful batch.
+      - name: latest_records_loaded
+        description: Records loaded in the latest successful batch.
+      - name: latest_requests_made
+        description: API requests made in the latest successful batch.
+      - name: current_job_count
+        description: Active current job count from warehouse current-state model.
+      - name: snapshot_row_count
+        description: Snapshot row count from warehouse snapshot model.
+      - name: freshest_data_timestamp
+        description: Greatest known timestamp across latest batch, request, current, and snapshot data.

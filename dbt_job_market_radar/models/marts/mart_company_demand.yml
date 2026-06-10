@@ -1,0 +1,33 @@
+version: 2
+
+models:
+  - name: mart_company_demand
+    description: >
+      Company demand mart for the Companies dashboard page. Grain: one row per company bucket.
+      Missing companies are grouped into the unknown bucket.
+    columns:
+      - name: company_name
+        description: Company display name or unknown fallback.
+        tests:
+          - not_null
+          - unique
+      - name: job_count
+        description: Number of active current jobs for this company bucket.
+        tests:
+          - not_null
+      - name: distinct_locations
+        description: Number of distinct location buckets for this company.
+        tests:
+          - not_null
+      - name: avg_relevance_score
+        description: Average relevance score for company jobs.
+      - name: relevant_job_count
+        description: Number of company jobs with relevance_score >= 60.
+        tests:
+          - not_null
+      - name: junior_friendly_job_count
+        description: Number of company jobs marked as junior-friendly.
+        tests:
+          - not_null
+      - name: last_seen_at
+        description: Latest last_seen_at for this company bucket.

@@ -1,0 +1,119 @@
+version: 2
+
+models:
+  - name: wh_job_posting_current
+    description: >
+      Current-state warehouse model with the latest known ingested version of each
+      France Travail job posting. Grain: one row per source_job_key. This model
+      represents the latest version in the data already ingested by the pipeline;
+      it does not guarantee that the job is still active on France Travail. True
+      active/inactive status requires repeated comparable search-scope runs and is
+      intentionally not implemented in Task 008.
+    columns:
+      - name: source_job_key
+        description: "Stable source-level key. Grain of the current-state model: one row per source_job_key."
+        tests:
+          - not_null
+          - unique
+
+      - name: canonical_job_key
+        description: "Canonical job key. In MVP this equals source_job_key."
+
+      - name: source_name
+        description: "Source system name. For this MVP model the expected value is france_travail."
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['france_travail']
+
+      - name: source_job_id
+        description: "Source-specific job identifier from France Travail."
+        tests:
+          - not_null
+
+      - name: latest_raw_job_posting_id
+        description: "Raw job posting row id for the selected latest known version."
+        tests:
+          - not_null
+
+      - name: latest_batch_id
+        description: "Batch id for the selected latest known version."
+        tests:
+          - not_null
+
+      - name: latest_request_id
+        description: "Request id for the selected latest known version."
+
+      - name: latest_search_scope_key
+        description: "Search scope key for the selected latest known version."
+
+      - name: job_title
+        description: "Latest known job title."
+
+      - name: normalized_job_title
+        description: "Lightly normalized latest known job title."
+
+      - name: company_name
+        description: "Latest known company name."
+
+      - name: company_key
+        description: "Lightly normalized company key."
+
+      - name: location_raw
+        description: "Latest known raw location text."
+
+      - name: location_key
+        description: "Lightly normalized location key."
+
+      - name: city
+        description: "Latest known city. Nullable if unavailable."
+
+      - name: region
+        description: "Latest known region. Nullable if unavailable."
+
+      - name: country
+        description: "Latest known country."
+
+      - name: contract_type
+        description: "Latest known contract type."
+
+      - name: work_mode
+        description: "Latest known work mode."
+
+      - name: seniority_level
+        description: "Latest known seniority signal. Not used for relevance scoring in this task."
+
+      - name: description_text
+        description: "Latest known job description text."
+
+      - name: published_at
+        description: "Latest known source publication timestamp."
+
+      - name: updated_at
+        description: "Latest known source update timestamp."
+
+      - name: retrieved_at
+        description: "Retrieval timestamp of the selected latest known version."
+
+      - name: source_url
+        description: "Latest known original job posting URL."
+
+      - name: payload_hash
+        description: "Payload hash for the selected latest known version."
+        tests:
+          - not_null
+
+      - name: first_seen_at
+        description: "Earliest retrieved_at observed for this source_job_key."
+
+      - name: last_seen_at
+        description: "Latest retrieved_at observed for this source_job_key."
+
+      - name: observation_count
+        description: "Number of snapshot observations for this source_job_key."
+        tests:
+          - not_null
+
+      - name: is_current_version
+        description: "Always true for rows in this current-state model. This is not the same as source-level active status."

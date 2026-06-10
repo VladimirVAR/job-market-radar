@@ -1,0 +1,33 @@
+version: 2
+
+models:
+  - name: mart_location_demand
+    description: >
+      Location demand mart for the Locations dashboard page. Grain: one row per location bucket.
+      Missing locations are grouped into the unknown bucket.
+    columns:
+      - name: location_name
+        description: City, region, country, or unknown fallback used for dashboard grouping.
+        tests:
+          - not_null
+          - unique
+      - name: job_count
+        description: Number of active current jobs in the location bucket.
+        tests:
+          - not_null
+      - name: share_of_jobs
+        description: Location job_count divided by total active current jobs.
+        tests:
+          - not_null
+      - name: distinct_companies
+        description: Number of distinct non-unknown companies in the location bucket.
+        tests:
+          - not_null
+      - name: avg_relevance_score
+        description: Average relevance score for jobs in the location bucket.
+      - name: junior_friendly_job_count
+        description: Number of junior-friendly jobs in the location bucket.
+        tests:
+          - not_null
+      - name: last_seen_at
+        description: Latest last_seen_at in the location bucket.
