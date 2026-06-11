@@ -1,4 +1,5 @@
 # Job Market Radar
+[![CI](https://github.com/VladimirVAR/job-market-radar/actions/workflows/ci.yml/badge.svg)](https://github.com/VladimirVAR/job-market-radar/actions/workflows/ci.yml)
 
 Job Market Radar is a local Data Engineering data product built to support a real Data Engineering job search. It collects job postings from public job APIs, preserves raw source responses, transforms them into analytical models, extracts market signals, and helps a junior or career-switching Data Engineer prioritize relevant opportunities and skill gaps.
 
