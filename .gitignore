@@ -31,3 +31,7 @@ airflow/*.db
 data/raw/
 data/output/
 reports/generated/
+reports/weekly/
+
+# Dev journal — not part of public portfolio
+tasks/

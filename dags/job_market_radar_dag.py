@@ -38,6 +38,7 @@ DBT_TARGET_PATH = os.getenv(
 )
 DBT_BIN = os.getenv("DBT_BIN", "dbt")
 
+
 def project_command(command: str) -> str:
     """Run a shell command from the mounted project root inside the Airflow container."""
     return f"set -euo pipefail; cd {shlex.quote(PROJECT_ROOT)}; {command}"
@@ -68,7 +69,7 @@ It runs:
 1. Raw France Travail ingestion
 2. dbt build
 3. Data quality checks
-4. Weekly report placeholder or report generation script
+4. Weekly Markdown report generation
 5. End marker
 
 ## Boundary
@@ -152,7 +153,7 @@ to use sample mode.
     generate_weekly_report = BashOperator(
         task_id="generate_weekly_report",
         bash_command=project_command(
-            "echo 'Weekly report generation placeholder. Full report logic will be implemented in Task 012.'"
+            "python -m src.reporting.generate_weekly_markdown_report"
         ),
     )
 
