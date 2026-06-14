@@ -7,8 +7,9 @@ Streamlit is a consumption layer only. All dashboard queries should read from
 from __future__ import annotations
 
 import ast
-import os
 import re
+import sys
+from pathlib import Path
 from typing import Any
 from urllib.parse import quote_plus
 
@@ -18,6 +19,15 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
 
 
+# Make imports work both when Streamlit is started from the repository root
+# and when a page is executed from inside streamlit_app/pages.
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from src.common.config import DatabaseConfig  # noqa: E402
+
+
 FORBIDDEN_BUSINESS_SCHEMAS = ("raw.", "staging.", "warehouse.")
 
 
@@ -25,21 +35,20 @@ class DashboardQueryError(ValueError):
     """Raised when a dashboard query violates the marts-only boundary."""
 
 
-def _env(name: str, default: str | None = None) -> str:
-    value = os.getenv(name, default)
-    if value is None or value == "":
-        raise RuntimeError(f"Missing required environment variable: {name}")
-    return value
-
-
 def get_database_url() -> str:
-    """Build a PostgreSQL SQLAlchemy URL from environment variables."""
-    host = _env("POSTGRES_HOST", "localhost")
-    port = _env("POSTGRES_PORT", "5432")
-    db = _env("POSTGRES_DB", "job_market_radar")
-    user = _env("POSTGRES_USER", "job_market_radar")
-    password = quote_plus(_env("POSTGRES_PASSWORD", "change_me"))
-    return f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{db}"
+    """Build a PostgreSQL SQLAlchemy URL from the shared project config.
+
+    The shared config loads the project-root `.env` file. This keeps Streamlit,
+    ingestion scripts, and other local tools aligned on the same database
+    settings instead of maintaining a second, dashboard-only config path.
+    """
+
+    db_config = DatabaseConfig.from_env()
+    password = quote_plus(db_config.password)
+    return (
+        "postgresql+psycopg2://"
+        f"{db_config.user}:{password}@{db_config.host}:{db_config.port}/{db_config.database}"
+    )
 
 
 @st.cache_resource(show_spinner=False)

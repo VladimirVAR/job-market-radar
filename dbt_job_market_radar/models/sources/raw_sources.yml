@@ -97,6 +97,62 @@ sources:
           - name: created_at
             description: Metadata creation timestamp.
 
+      - name: raw_adzuna_job_postings
+        description: One raw Adzuna job posting payload per source job per request per batch.
+        columns:
+          - name: raw_job_posting_id
+            description: Unique raw row identifier.
+            tests:
+              - not_null
+              - unique
+          - name: batch_id
+            description: Related load batch.
+            tests:
+              - not_null
+              - relationships:
+                  arguments:
+                    to: source('raw', 'raw_load_batches')
+                    field: batch_id
+          - name: request_id
+            description: Related API request.
+            tests:
+              - not_null
+              - relationships:
+                  arguments:
+                    to: source('raw', 'raw_api_requests')
+                    field: request_id
+          - name: source_name
+            description: Source system name. Should be adzuna for this table.
+            tests:
+              - not_null
+              - accepted_values:
+                  arguments:
+                    values: ['adzuna']
+          - name: source_job_id
+            description: Adzuna job identifier.
+            tests:
+              - not_null
+          - name: source_job_key
+            description: Stable source-level key, for example adzuna:{source_job_id}.
+            tests:
+              - not_null
+          - name: search_scope_key
+            description: Comparable search scope that returned the job.
+            tests:
+              - not_null
+          - name: raw_payload_json
+            description: Full raw Adzuna job payload stored as JSONB.
+            tests:
+              - not_null
+          - name: payload_hash
+            description: Stable hash of the raw payload for change detection.
+            tests:
+              - not_null
+          - name: ingested_at
+            description: Timestamp when the raw row was ingested.
+          - name: created_at
+            description: Metadata creation timestamp.
+
       - name: raw_france_travail_job_postings
         description: One raw France Travail job posting payload per source job per request per batch.
         columns:

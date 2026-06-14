@@ -1,9 +1,19 @@
 FROM apache/airflow:2.10.5
 
-COPY requirements-airflow.txt /requirements-airflow.txt
-COPY requirements-dbt.txt /requirements-dbt.txt
+USER root
 
-RUN python -m venv /home/airflow/dbt_venv \
-    && /home/airflow/dbt_venv/bin/pip install --no-cache-dir --upgrade pip \
-    && /home/airflow/dbt_venv/bin/pip install --no-cache-dir -r /requirements-dbt.txt \
-    && pip install --no-cache-dir -r /requirements-airflow.txt
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+USER airflow
+
+COPY --chown=airflow:root requirements-airflow.txt /requirements-airflow.txt
+COPY --chown=airflow:root requirements-dbt.txt /requirements-dbt.txt
+
+RUN python -m venv /home/airflow/dbt_venv
+
+RUN /home/airflow/dbt_venv/bin/pip install --no-cache-dir -r /requirements-dbt.txt
+
+RUN pip install --no-cache-dir -r /requirements-airflow.txt

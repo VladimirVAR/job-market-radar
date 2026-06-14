@@ -1,4 +1,4 @@
--- Job Market Radar — Analytics Showcase Queries
+-- Job Market Radar — Analytical Queries
 -- Purpose: technical review SQL examples based only on marts.
 -- Business pages must not query raw, staging, or warehouse models directly.
 

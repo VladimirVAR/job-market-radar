@@ -1,6 +1,7 @@
-"""Loader for raw.raw_france_travail_job_postings.
+"""Loader for raw job posting tables.
 
 Grain: one raw job posting payload per source job per request per batch.
+Supports multiple sources via an allowlist of known target tables.
 """
 
 from __future__ import annotations
@@ -12,6 +13,12 @@ from src.common.database import jsonb
 from src.common.dates import utc_now
 from src.common.hashing import stable_json_hash
 from src.ingestion.france_travail.parser import RawJobPayload
+
+
+_RAW_JOB_TABLES: dict[str, str] = {
+    "france_travail": "raw.raw_france_travail_job_postings",
+    "adzuna": "raw.raw_adzuna_job_postings",
+}
 
 
 def build_source_job_key(source_name: str, source_job_id: str) -> str:
@@ -36,10 +43,14 @@ def insert_raw_job_postings(
 ) -> int:
     """Insert raw job payloads and return inserted row count.
 
-    This function intentionally extracts only technical lineage fields. It does
-    not parse business fields such as title, company, skills, seniority, or
-    relevance.
+    Dispatches to the correct raw table based on source_name.
+    This function intentionally extracts only technical lineage fields.
     """
+
+    target_table = _RAW_JOB_TABLES.get(source_name)
+    if target_table is None:
+        known = list(_RAW_JOB_TABLES)
+        raise ValueError(f"Unknown source_name: {source_name!r}. Known sources: {known}")
 
     rows = []
     now = utc_now()
@@ -66,8 +77,8 @@ def insert_raw_job_postings(
 
     with connection.cursor() as cursor:
         cursor.executemany(
-            """
-            insert into raw.raw_france_travail_job_postings (
+            f"""
+            insert into {target_table} (
                 raw_job_posting_id,
                 batch_id,
                 request_id,

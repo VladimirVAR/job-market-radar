@@ -1,0 +1,99 @@
+version: 2
+
+models:
+  - name: stg_adzuna_job_postings
+    description: >
+      Staged Adzuna job postings. One row per raw_job_posting_id.
+      Maps Adzuna API field names to the canonical staging schema shared
+      with all sources. Light classification for work_mode and seniority_level
+      is derived from title and description text.
+    columns:
+      - name: raw_job_posting_id
+        description: Unique raw row identifier from raw.raw_adzuna_job_postings.
+        tests:
+          - not_null
+          - unique
+
+      - name: batch_id
+        description: Related load batch identifier.
+        tests:
+          - not_null
+
+      - name: request_id
+        description: Related API request identifier.
+        tests:
+          - not_null
+
+      - name: source_name
+        description: Source system name. Always adzuna for this model.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['adzuna']
+
+      - name: source_job_id
+        description: Adzuna job identifier from the id field.
+        tests:
+          - not_null
+
+      - name: source_job_key
+        description: Stable source-level key, for example adzuna:{source_job_id}.
+        tests:
+          - not_null
+
+      - name: search_scope_key
+        description: Comparable search scope that returned this job.
+        tests:
+          - not_null
+
+      - name: job_title
+        description: Job title from the title field.
+
+      - name: company_name
+        description: Company display name from company.display_name.
+
+      - name: location_raw
+        description: Full location string from location.display_name.
+
+      - name: city
+        description: City extracted from location.area[2] (third array element).
+
+      - name: region
+        description: Region extracted from location.area[1] (second array element).
+
+      - name: country
+        description: Country from location.area[0], defaulting to France.
+
+      - name: contract_type
+        description: Uppercased contract type from contract_type field (PERMANENT, CONTRACT, etc.).
+
+      - name: work_mode
+        description: >
+          Light classification inferred from description and title text.
+          Values: remote, hybrid, on_site, unknown.
+
+      - name: seniority_level
+        description: >
+          Light classification inferred from title and description text.
+          Values: junior, senior, unknown.
+
+      - name: description_text
+        description: Full job description from the description field.
+
+      - name: published_at
+        description: Job creation timestamp from the created field.
+
+      - name: updated_at
+        description: Always null for Adzuna — no update timestamp in API response.
+
+      - name: retrieved_at
+        description: Timestamp when the raw row was ingested.
+
+      - name: source_url
+        description: Application redirect URL from redirect_url.
+
+      - name: payload_hash
+        description: Stable SHA-256 hash of the raw payload for change detection.
+        tests:
+          - not_null

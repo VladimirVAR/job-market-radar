@@ -1,4 +1,4 @@
-{{ config(materialized='view') }}
+{{ config(materialized='table') }}
 
 -- Task 013C Part A
 -- Grain: one current active job posting enriched with candidate-specific fit scoring.

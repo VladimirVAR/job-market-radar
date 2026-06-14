@@ -4,9 +4,9 @@ models:
   - name: wh_job_posting_current
     description: >
       Current-state warehouse model with the latest known ingested version of each
-      France Travail job posting. Grain: one row per source_job_key. This model
+      job posting across all sources. Grain: one row per source_job_key. This model
       represents the latest version in the data already ingested by the pipeline;
-      it does not guarantee that the job is still active on France Travail. True
+      it does not guarantee that the job is still active on the source. True
       active/inactive status requires repeated comparable search-scope runs and is
       intentionally not implemented in Task 008.
     columns:
@@ -20,15 +20,15 @@ models:
         description: "Canonical job key. In MVP this equals source_job_key."
 
       - name: source_name
-        description: "Source system name. For this MVP model the expected value is france_travail."
+        description: "Source system name. Known values: france_travail, adzuna."
         tests:
           - not_null
           - accepted_values:
               arguments:
-                values: ['france_travail']
+                values: ['france_travail', 'adzuna']
 
       - name: source_job_id
-        description: "Source-specific job identifier from France Travail."
+        description: "Source-specific job identifier from the originating source API."
         tests:
           - not_null
 

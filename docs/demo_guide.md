@@ -327,5 +327,5 @@ Add:
 - data catalog
 - dbt tests
 - Airflow logs
-- sample SQL/showcase queries
+- sample analytical SQL queries
 - code walkthrough of selected modules
