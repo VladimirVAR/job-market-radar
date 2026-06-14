@@ -60,10 +60,10 @@ dbt_job_market_radar/tests/marts/test_mart_missing_skills_sanity.sql
 dbt_job_market_radar/tests/marts/test_mart_weekly_market_summary_sanity.sql
 ```
 
-### Showcase SQL
+### Analytics SQL
 
 ```text
-sql/analytics/showcase_queries.sql
+sql/analytics/analytics_queries.sql
 ```
 
 ### Execution report

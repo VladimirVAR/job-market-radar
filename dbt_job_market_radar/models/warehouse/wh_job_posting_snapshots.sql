@@ -2,8 +2,9 @@
 
 with staging as (
 
-    select *
-    from {{ ref('stg_france_travail_job_postings') }}
+    select * from {{ ref('stg_france_travail_job_postings') }}
+    union all
+    select * from {{ ref('stg_adzuna_job_postings') }}
 
 ),
 

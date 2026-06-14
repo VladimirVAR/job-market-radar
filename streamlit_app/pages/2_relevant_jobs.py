@@ -68,6 +68,7 @@ MAIN_CANDIDATE_FIT_COLUMNS = [
     "candidate_fit_band",
     "job_title",
     "company_name",
+    "source_name",
     "city",
     "contract_type",
     "work_mode",
@@ -78,6 +79,7 @@ MAIN_CANDIDATE_FIT_COLUMNS = [
 LEGACY_MAIN_COLUMNS = [
     "job_title",
     "company_name",
+    "source_name",
     "city",
     "contract_type",
     "work_mode",
@@ -125,6 +127,7 @@ FRIENDLY_COLUMN_LABELS = {
     "candidate_fit_band": "Fit band",
     "job_title": "Job title",
     "company_name": "Company",
+    "source_name": "Source",
     "city": "City",
     "contract_type": "Contract",
     "work_mode": "Work mode",
@@ -425,6 +428,12 @@ with st.sidebar:
         selected_contracts = st.multiselect("Contract type", contracts)
         if selected_contracts:
             filtered = filtered[filtered["contract_type"].isin(selected_contracts)]
+
+    if "source_name" in filtered.columns:
+        sources = sorted([x for x in filtered["source_name"].dropna().unique().tolist() if str(x).strip()])
+        selected_sources = st.multiselect("Source", sources)
+        if selected_sources:
+            filtered = filtered[filtered["source_name"].isin(selected_sources)]
 
     if "is_junior_friendly" in filtered.columns:
         junior_only = st.checkbox("Junior-friendly only", value=False)

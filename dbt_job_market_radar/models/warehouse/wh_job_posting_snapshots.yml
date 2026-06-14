@@ -3,12 +3,12 @@ version: 2
 models:
   - name: wh_job_posting_snapshots
     description: >
-      Warehouse historical observation model for France Travail job postings.
+      Warehouse historical observation model for all job postings across sources.
       Grain: one row per raw job posting observation, identified by raw_job_posting_id.
       This is not a dbt snapshot object; it is a warehouse SQL model that preserves
       one ingested observation per raw row and keeps lineage back to raw ingestion.
-      The model depends on ref('stg_france_travail_job_postings') and does not read
-      raw tables directly.
+      The model unions stg_france_travail_job_postings and stg_adzuna_job_postings
+      and does not read raw tables directly.
     columns:
       - name: snapshot_id
         description: "Warehouse snapshot identifier. In MVP this equals raw_job_posting_id."
@@ -20,7 +20,7 @@ models:
         description: "Alias for snapshot_id kept for compatibility with warehouse naming conventions."
 
       - name: raw_job_posting_id
-        description: "Raw layer job posting row identifier; preserves lineage back to raw.raw_france_travail_job_postings."
+        description: "Raw layer job posting row identifier; preserves lineage back to source raw tables."
         tests:
           - not_null
           - unique
@@ -36,20 +36,20 @@ models:
           - not_null
 
       - name: source_name
-        description: "Source system name. For this MVP model the expected value is france_travail."
+        description: "Source system name. Known values: france_travail, adzuna."
         tests:
           - not_null
           - accepted_values:
               arguments:
-                values: ['france_travail']
+                values: ['france_travail', 'adzuna']
 
       - name: source_job_id
-        description: "Source-specific job identifier from France Travail."
+        description: "Source-specific job identifier from the originating source API."
         tests:
           - not_null
 
       - name: source_job_key
-        description: "Stable source-level key, for example france_travail:{source_job_id}."
+        description: "Stable source-level key, for example france_travail:{id} or adzuna:{id}."
         tests:
           - not_null
 
@@ -60,13 +60,13 @@ models:
         description: "Comparable search scope that returned this job posting. Required for future inactive/disappeared job logic."
 
       - name: job_title
-        description: "Job title parsed in staging from the France Travail raw payload. Nullable if source payload omits it."
+        description: "Job title parsed in staging from the source payload. Nullable if source payload omits it."
 
       - name: normalized_job_title
         description: "Lightly normalized job title for future grouping and matching."
 
       - name: company_name
-        description: "Company name parsed in staging from the France Travail raw payload. Nullable if source payload omits it."
+        description: "Company name parsed in staging from the source payload. Nullable if source payload omits it."
 
       - name: company_key
         description: "Lightly normalized company key for warehouse-level grouping."

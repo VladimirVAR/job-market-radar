@@ -1,15 +1,54 @@
 # Job Market Radar
 [![CI](https://github.com/VladimirVAR/job-market-radar/actions/workflows/ci.yml/badge.svg)](https://github.com/VladimirVAR/job-market-radar/actions/workflows/ci.yml)
 
-Job Market Radar is a local Data Engineering data product built to support a real Data Engineering job search. It collects job postings from public job APIs, preserves raw source responses, transforms them into analytical models, extracts market signals, and helps a junior or career-switching Data Engineer prioritize relevant opportunities and skill gaps.
+ELT portfolio project: collects job postings from France Travail and Adzuna APIs, transforms
+them through PostgreSQL and dbt, orchestrates with Airflow, and presents analytics in a
+Streamlit dashboard.
+
+Built to support a Data Engineering job search in France. Turns noisy job listings into
+analytical signals: relevant job ranking, skill gap analysis, location and company demand,
+and data freshness tracking across two live API sources.
 
 ---
 
-## Problem Statement
+## Tech Stack
 
-Job search is noisy. A candidate often sees many job postings with different titles, inconsistent descriptions, unclear seniority expectations, and scattered skill requirements.
+| Area | Tool |
+|---|---|
+| Language | Python |
+| Database | PostgreSQL |
+| Transformations | dbt |
+| Orchestration | Airflow |
+| Dashboard | Streamlit |
+| Environment | Docker / Docker Compose |
+| Data modeling | SQL |
 
-This project turns that unstructured job-search process into a small analytical system that can answer questions such as:
+---
+
+## Phase 2: Adzuna Integration Complete
+
+Two job sources active and validated end-to-end in a Dockerized environment.
+
+| Metric | Result |
+|---|---|
+| France Travail current jobs | 64 |
+| Adzuna current jobs | 100 |
+| mart_relevant_jobs (combined) | 164 |
+| dbt build | PASS=187 WARN=0 ERROR=0 SKIP=0 |
+| Airflow DAG tasks passed | 7 / 7 |
+
+Full release notes: [docs/release/phase_2_adzuna_airflow_validation.md](docs/release/phase_2_adzuna_airflow_validation.md)
+
+---
+
+<details>
+<summary><strong>Problem statement</strong></summary>
+
+Job search is noisy. A candidate often sees many job postings with different titles,
+inconsistent descriptions, unclear seniority expectations, and scattered skill requirements.
+
+This project turns that unstructured job-search process into a small analytical system
+that can answer questions such as:
 
 - Which current jobs are most relevant to the candidate profile?
 - Which skills are most demanded?
@@ -17,46 +56,34 @@ This project turns that unstructured job-search process into a small analytical 
 - Which cities and companies are active in the target market?
 - What changed in the market during the latest pipeline runs?
 
----
+</details>
 
-## Target User
+<details>
+<summary><strong>Target user and MVP scope</strong></summary>
 
-The primary MVP user is a junior or career-switching Data Engineering candidate in France / Europe.
+The primary MVP user is a junior or career-switching Data Engineering candidate in
+France and Europe.
 
-The candidate profile used by the MVP includes:
+The candidate profile used by the MVP includes: Python, SQL, PostgreSQL, Docker, dbt,
+Airflow, and AWS basics. Growth skills tracked may include Spark, Kafka, Snowflake,
+BigQuery, Azure, GCP, Terraform, Kubernetes, and CI/CD.
 
-- Python
-- SQL
-- PostgreSQL
-- Docker
-- dbt
-- Airflow
-- AWS basics
-- Data Engineering fundamentals
+**Implemented scope:**
 
-Growth skills tracked by the MVP may include Spark, Kafka, Snowflake, BigQuery, Azure, GCP, Terraform, Kubernetes, and CI/CD.
-
----
-
-## MVP Scope
-
-Implemented MVP scope:
-
-- France Travail / sample-source ingestion
-- Raw API response preservation in PostgreSQL
-- Load batch tracking
-- API request metadata tracking
+- France Travail and Adzuna ingestion (two live API sources)
+- Raw API response preservation in PostgreSQL as JSONB
+- Load batch tracking and API request metadata tracking
 - dbt staging, warehouse, and marts layers
 - Snapshot and current-state job posting models
 - Rule-based skill extraction
-- Simple explainable relevance scoring
+- Explainable relevance scoring
 - Candidate Fit Score v1 for first-pass job prioritization
 - Data quality checks
 - Airflow orchestration
 - Streamlit dashboard reading from marts
-- Project documentation, runbooks, and screenshots
+- Project documentation and runbooks
 
-Out of scope for the MVP:
+**Out of scope for the MVP:**
 
 - LinkedIn or Indeed scraping
 - Production deployment
@@ -64,40 +91,10 @@ Out of scope for the MVP:
 - Real-time streaming architecture
 - Advanced cross-source entity resolution
 
----
+</details>
 
-## Candidate Fit Score v1
-
-The dashboard includes a **Candidate Fit Score**: an explainable rule-based signal that ranks live job postings for a career-switching junior Data Engineer profile.
-
-The score helps answer:
-
-```text
-Which jobs are most relevant for this candidate, and why?
-```
-
-Candidate Fit Score is calculated in the dbt marts layer and exposed through `marts.mart_relevant_jobs`. Streamlit only displays the prepared fields.
-
-The score is not AI/ML, not a guarantee that the candidate should apply, and not a final hiring decision. It is a first-pass prioritization signal designed to make the dashboard more useful and explainable.
-
-Candidate Fit fields include:
-
-- `candidate_fit_score`
-- `candidate_fit_band`
-- `application_priority`
-- `candidate_fit_reason`
-- `matched_candidate_skills`
-- `missing_growth_skills`
-
-See:
-
-- `docs/product/candidate_profile_v1.md`
-- `docs/product/relevance_scoring_v1.md`
-- `docs/architecture/scoring_contract.md`
-
----
-
-## Architecture Overview
+<details>
+<summary><strong>Architecture overview</strong></summary>
 
 The project follows a layered batch-oriented ELT architecture:
 
@@ -112,7 +109,7 @@ sources
 
 ```mermaid
 flowchart LR
-    A[France Travail API / Sample Data] --> B[Python Ingestion]
+    A[France Travail + Adzuna APIs] --> B[Python Ingestion]
     B --> C[(PostgreSQL Raw)]
     C --> D[dbt Staging]
     D --> E[dbt Warehouse]
@@ -129,53 +126,241 @@ flowchart LR
     J --> H
 ```
 
-### Component Responsibilities
+**Component responsibilities:**
 
 | Component | Responsibility |
 |---|---|
-| Python | API access, request building, raw loading, batch/request metadata |
+| Python | API access, request building, raw loading, batch and request metadata |
 | PostgreSQL | Local analytical store for raw data, dbt models, marts, and dashboard-ready outputs |
-| dbt | Transformations after raw loading: staging, warehouse, marts, tests, lineage |
+| dbt | Transformations after raw loading: staging, warehouse, marts, tests, and lineage |
 | Airflow | Pipeline orchestration and task dependencies |
 | Streamlit | Presentation and exploration layer |
 | Markdown docs | Architecture, runbook, validation, release notes, and demo story |
 
----
+**Why Streamlit consumes marts only:**
 
-## Why Streamlit Consumes Marts Only
+The dashboard is intentionally thin. Business pages read from `marts.*` only. dbt owns all
+business transformations and metrics. Streamlit only presents and explores prepared data.
 
-The dashboard is intentionally thin.
+This keeps responsibilities clear and makes the project easier to test and explain.
 
-Streamlit business pages read from `marts.*` only. They do not calculate relevance scores, skill demand, missing skills, or weekly summaries directly.
+</details>
 
-This keeps responsibilities clear:
+<details>
+<summary><strong>Pipeline flow</strong></summary>
 
-- dbt owns business transformations and metrics.
-- marts expose dashboard-ready analytical outputs.
-- Streamlit only presents and explores prepared data.
+```text
+France Travail API + Adzuna API
+  -> raw PostgreSQL tables
+  -> dbt staging models (one per source)
+  -> dbt warehouse models (snapshot + current, union of both sources)
+  -> dbt marts
+  -> data quality checks
+  -> Streamlit dashboard
+```
 
-This design required adding an intermediate Task 011A for analytics marts before Task 011B for Streamlit. The decision keeps the architecture cleaner and makes the project easier to test, explain, and extend.
+**Airflow DAG flow:**
 
----
+```text
+start
+  -> [ingest_france_travail_raw_jobs, ingest_adzuna_raw_jobs]  (parallel)
+  -> dbt_build
+  -> run_data_quality_checks
+  -> generate_weekly_report
+  -> end
+```
 
-## Tech Stack
+</details>
 
-| Area | Tool |
+<details>
+<summary><strong>Data sources</strong></summary>
+
+**Implemented sources:**
+
+| Source | Phase | Auth |
+|---|---|---|
+| France Travail API Offres d'emploi | Phase 1 | OAuth2 client credentials |
+| Adzuna API | Phase 2 | API key via query params |
+
+Both sources feed the same warehouse and mart layers through separate staging models.
+`mart_data_freshness` shows one row per source so freshness is tracked independently.
+
+Both sources support a sample mode for local demos without live API credentials.
+
+**Future sources:**
+
+- The Muse API
+
+**Explicitly excluded:**
+
+- LinkedIn scraping
+- Indeed scraping
+- Any source that violates website Terms of Service
+
+</details>
+
+<details>
+<summary><strong>Data model summary</strong></summary>
+
+**Raw tables:**
+
+- `raw.raw_load_batches`
+- `raw.raw_api_requests`
+- `raw.raw_france_travail_job_postings`
+- `raw.raw_adzuna_job_postings`
+
+**dbt models:**
+
+- `staging.stg_france_travail_job_postings`
+- `staging.stg_adzuna_job_postings`
+- `warehouse.wh_job_posting_snapshots` (union of both staging sources)
+- `warehouse.wh_job_posting_current`
+- `marts.mart_job_postings_current`
+- `marts.mart_job_market_overview`
+- `marts.mart_skill_demand`
+- `marts.mart_location_demand`
+- `marts.mart_company_demand`
+- `marts.mart_data_freshness` (one row per source)
+- `marts.mart_relevant_jobs`
+- `marts.mart_missing_skills`
+- `marts.mart_location_activity`
+- `marts.mart_company_activity`
+- `marts.mart_weekly_market_summary`
+
+See `docs/data_catalog.md` for model-level grain and field documentation.
+
+</details>
+
+<details>
+<summary><strong>Candidate Fit Score and dashboard</strong></summary>
+
+**Candidate Fit Score v1** is an explainable rule-based signal that ranks live job postings
+for a career-switching junior Data Engineer profile.
+
+Calculated in `marts.mart_relevant_jobs`. Streamlit presents the prepared fields:
+
+- `candidate_fit_score`
+- `candidate_fit_band`
+- `application_priority`
+- `candidate_fit_reason`
+- `matched_candidate_skills`
+- `missing_growth_skills`
+
+The score is rule-based and deterministic. It is not AI/ML and not a hiring decision.
+It is a first-pass prioritization signal designed to make the dashboard useful and explainable.
+
+See `docs/product/candidate_profile_v1.md`, `docs/product/relevance_scoring_v1.md`, and
+`docs/architecture/scoring_contract.md`.
+
+**Dashboard pages:**
+
+- Overview
+- Relevant Jobs (with Candidate Fit Score and source filter for France Travail / Adzuna)
+- Skill Radar
+- Locations
+- Companies
+- Weekly Report
+- Data Freshness (per source)
+
+**Example analytical outputs:**
+
+- Best matching current jobs with explanation
+- Top demanded skills
+- Top missing skills for the candidate profile
+- Top cities and regions by job count
+- Companies with repeated postings
+- Weekly new jobs summary
+- Source coverage and data freshness per API
+
+</details>
+
+<details>
+<summary><strong>How to run locally</strong></summary>
+
+See the full runbook in `docs/local_runbook.md`.
+
+**Prerequisites:** Docker Desktop running, credentials in `.env`.
+
+```bash
+cp .env.example .env
+# Fill in: FRANCE_TRAVAIL_CLIENT_ID, FRANCE_TRAVAIL_CLIENT_SECRET,
+#           ADZUNA_APP_ID, ADZUNA_APP_KEY
+```
+
+```bash
+docker compose up -d
+```
+
+**Manual ingestion:**
+
+```bash
+python -m src.pipeline.run_france_travail_ingestion
+python -m src.pipeline.run_adzuna_ingestion
+```
+
+**dbt transformation:**
+
+```bash
+dbt build --project-dir dbt_job_market_radar --profiles-dir dbt_job_market_radar
+```
+
+**Data quality checks:**
+
+```bash
+python -m src.pipeline.run_data_quality_checks
+```
+
+**Streamlit dashboard:**
+
+```bash
+streamlit run streamlit_app/app.py
+```
+
+**Or trigger the full Airflow DAG.** It handles ingestion from both sources, dbt build,
+DQ checks, and report generation in the correct dependency order.
+
+</details>
+
+<details>
+<summary><strong>Validation</strong></summary>
+
+A successful Airflow run is not enough. A complete validation means:
+
+- ingestion completed for both sources
+- dbt build completed with no errors or warnings
+- data quality checks passed
+- mart outputs are populated and available
+- Streamlit can read the prepared marts
+
+**Phase 2 end-to-end Airflow validation (Dockerized):**
+
+| Task | Result |
 |---|---|
-| Language | Python |
-| Database | PostgreSQL |
-| Transformations | dbt |
-| Orchestration | Airflow |
-| Dashboard | Streamlit |
-| Local environment | Docker / Docker Compose |
-| Data modeling | SQL |
-| Documentation | Markdown |
+| start | success |
+| ingest_france_travail_raw_jobs | success |
+| ingest_adzuna_raw_jobs | success |
+| dbt_build | success |
+| run_data_quality_checks | success |
+| generate_weekly_report | success |
+| end | success |
 
----
+**Final data state:**
 
-## Repository Structure
+| Table / mart | Count |
+|---|---|
+| warehouse.wh_job_posting_current (france_travail) | 64 |
+| warehouse.wh_job_posting_current (adzuna) | 100 |
+| marts.mart_relevant_jobs | 164 |
 
-Expected project structure:
+dbt build: `PASS=187 WARN=0 ERROR=0 SKIP=0`
+
+Note: snapshot row counts are doubled relative to current counts because both manual
+ingestion and the Airflow DAG ran during Phase 2 validation.
+
+</details>
+
+<details>
+<summary><strong>Repository structure</strong></summary>
 
 ```text
 job-market-radar/
@@ -185,7 +370,10 @@ job-market-radar/
   requirements.txt
 
   src/
+    common/
     ingestion/
+      france_travail/
+      adzuna/
     loaders/
     pipeline/
     reporting/
@@ -197,6 +385,8 @@ job-market-radar/
     models/
       sources/
       staging/
+        france_travail/
+        adzuna/
       warehouse/
       marts/
     tests/
@@ -206,127 +396,21 @@ job-market-radar/
     db.py
     pages/
 
-  docs/
-    architecture.md
-    data_flow.md
-    data_catalog.md
-    demo_guide.md
-    demo_script.md
-    local_runbook.md
-    validation_summary.md
-    limitations_and_future_work.md
+  sql/
+    ddl/
+    analytics/
 
+  docs/
   reports/
     task_execution/
 ```
 
----
+</details>
 
-## Data Source
-
-### MVP source
-
-- France Travail API Offres d'emploi
-
-### Local validation mode
-
-- Sample-mode ingestion can be used for reliable local demos without depending on live API availability.
-
-### Future sources
-
-- Adzuna API
-- The Muse API
-
-### Explicitly excluded
-
-- LinkedIn scraping
-- Indeed scraping
-- Any source that violates website Terms of Service
-
----
-
-## Pipeline Flow
-
-The implemented MVP flow is:
-
-```text
-France Travail / sample source
-  -> raw PostgreSQL tables
-  -> dbt staging models
-  -> dbt warehouse models
-  -> dbt marts
-  -> data quality checks
-  -> Airflow orchestration
-  -> Streamlit dashboard
-```
-
-Airflow DAG flow:
-
-```text
-start
-  -> ingest_france_travail_raw_jobs
-  -> dbt_build
-  -> run_data_quality_checks
-  -> generate_weekly_report placeholder
-  -> end
-```
-
----
-
-## Data Model Summary
-
-Main raw tables:
-
-- `raw.raw_load_batches`
-- `raw.raw_api_requests`
-- `raw.raw_france_travail_job_postings`
-
-Main dbt models:
-
-- `staging.stg_france_travail_job_postings`
-- `warehouse.wh_job_posting_snapshots`
-- `warehouse.wh_job_posting_current`
-- `marts.mart_job_postings_current`
-- `marts.mart_job_market_overview`
-- `marts.mart_skill_demand`
-- `marts.mart_location_demand`
-- `marts.mart_company_demand`
-- `marts.mart_data_freshness`
-- `marts.mart_relevant_jobs`
-- `marts.mart_missing_skills`
-- `marts.mart_location_activity`
-- `marts.mart_company_activity`
-- `marts.mart_weekly_market_summary`
-
-Every important model should have a documented grain. See `docs/data_catalog.md` for model-level details.
-
----
-
-## Dashboard Summary
-
-The Streamlit dashboard includes:
-
-- Overview
-- Relevant Jobs
-- Skill Radar
-- Locations
-- Companies
-- Weekly Report
-- Data Freshness
-
-Business pages read from `marts.*` only.
-
-The Relevant Jobs page displays Candidate Fit Score fields from `marts.mart_relevant_jobs`, including application priority, candidate fit band, matched skills, missing growth skills, and candidate fit explanation.
-
-The Streamlit database access layer includes guardrails to reject accidental business-page queries against `raw.*`, `staging.*`, or `warehouse.*`.
-
----
-
-## Screenshots
+<details>
+<summary><strong>Screenshots</strong></summary>
 
 The repository includes live-data MVP screenshots in `docs/screenshots/`.
-
-Recommended screenshots for a quick project review:
 
 | Area | Screenshot |
 |---|---|
@@ -340,94 +424,12 @@ Recommended screenshots for a quick project review:
 | Data Freshness | `docs/screenshots/streamlit_data_freshness.png` |
 | Airflow DAG Validation | `docs/screenshots/airflow_dag_success.png` |
 
-Screenshots are captured from the local live-data MVP and should not include secrets, API keys, `.env` files, or private credentials.
+Screenshots are captured from the local live-data MVP and do not include credentials or secrets.
 
----
+</details>
 
-## How to Run Locally
-
-See the full runbook in `docs/local_runbook.md`.
-
-Typical local flow:
-
-```bash
-cp .env.example .env
-```
-
-```bash
-docker compose up -d
-```
-
-```bash
-python -m src.pipeline.run_france_travail_ingestion
-```
-
-```bash
-dbt build --project-dir dbt_job_market_radar --profiles-dir dbt_job_market_radar
-```
-
-```bash
-python -m src.pipeline.run_data_quality_checks
-```
-
-```bash
-streamlit run streamlit_app/app.py
-```
-
-Airflow can be triggered manually after services are running:
-
-```bash
-airflow dags trigger job_market_radar
-```
-
-If Airflow is running inside Docker, execute the command from the appropriate Airflow container or use the Airflow UI.
-
----
-
-## Validation
-
-Validation is intentionally separate from orchestration.
-
-A successful Airflow run is not enough. For this project, a successful pipeline means:
-
-- ingestion completed
-- dbt build completed
-- data quality checks passed
-- dashboard marts are available
-- Streamlit can read the prepared marts
-
-Validated commands used by the project:
-
-```bash
-dbt build --project-dir dbt_job_market_radar --profiles-dir dbt_job_market_radar
-```
-
-```bash
-python -m src.pipeline.run_data_quality_checks
-```
-
-```bash
-streamlit run streamlit_app/app.py
-```
-
----
-
-## Example Analytical Outputs
-
-The marts and dashboard are designed to support outputs such as:
-
-- Best matching current jobs
-- Top demanded skills
-- Top missing skills
-- Top cities and regions
-- Companies with repeated postings
-- Weekly new jobs summary
-- Source coverage and data freshness
-- Duplicate or lineage validation examples
-
----
-
-## Key Engineering Decisions
+<details>
+<summary><strong>Key engineering decisions</strong></summary>
 
 | Decision | Reason |
 |---|---|
@@ -439,29 +441,31 @@ The marts and dashboard are designed to support outputs such as:
 | Streamlit consumes marts only | Clean separation between business logic and UI |
 | Rule-based skill extraction in MVP | Explainable, simple, easy to validate |
 | Snapshot + current-state warehouse models | Historical observations plus current dashboard views |
+| Uniform staging schema across sources | Both sources feed the same warehouse and mart models without extra joins |
 
----
+</details>
 
-## Known Limitations
+<details>
+<summary><strong>Known limitations</strong></summary>
 
-- France Travail sample-mode is used for reliable local validation.
-- Live API mode may require valid France Travail API credentials.
-- The local demo dataset may be small.
+- Streamlit UI has not been verified in a browser during Phase 2 development. Code review
+  confirms that `source_name` is exposed in marts and the source filter is wired up on the
+  Relevant Jobs page, but a live browser check was not performed.
+- Live API modes require valid credentials for France Travail and Adzuna.
+- The local dataset size depends on API rate limits and the configured page count per source.
 - Skill extraction is rule-based and may miss synonyms or produce false positives.
-- Relevance scoring is simple and explainable, not machine learning.
-- Candidate Fit Score v1 is rule-based and deterministic; it is not a machine learning recommendation model.
-- Candidate Profile v1 is hardcoded for the MVP and has no UI editor or multi-user support.
-- Weekly history is limited until more scheduled runs accumulate.
-- The Streamlit UI is intentionally simple.
-- `generate_weekly_report` in Airflow is currently a placeholder.
+- Candidate Fit Score v1 is rule-based and deterministic. It is not a machine learning model.
+- Candidate Profile v1 is hardcoded for the MVP with no UI editor or multi-user support.
+- Weekly history is limited until more scheduled pipeline runs accumulate.
 - Deployment is not in scope for the MVP.
 - No LinkedIn or Indeed scraping is used.
 
----
+</details>
 
-## Future Improvements
+<details>
+<summary><strong>Future improvements</strong></summary>
 
-- Add more job sources such as Adzuna or The Muse.
+- Add more job sources (e.g., The Muse API).
 - Add longer historical trend tracking.
 - Improve skill extraction with better NLP.
 - Add salary normalization if reliable salary fields become available.
@@ -469,9 +473,7 @@ The marts and dashboard are designed to support outputs such as:
 - Improve relevance scoring.
 - Add configurable candidate profiles and score weighting.
 - Track Candidate Fit Score historically across pipeline runs.
-- Add CI checks.
 - Add optional hosted deployment.
 - Add automated screenshot and demo generation.
-- Replace the weekly report placeholder with a generated report artifact.
 
----
+</details>

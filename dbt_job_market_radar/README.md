@@ -10,15 +10,18 @@ raw -> staging -> warehouse -> marts
 
 ## Current scope
 
-Task 006 creates the dbt foundation only. It defines the project structure,
-PostgreSQL profile example, schema configuration, and raw source definitions.
-
-Task 007 will build the first staging model:
+The dbt project now supports the multi-source pipeline used by the public
+Job Market Radar project:
 
 ```text
-raw.raw_france_travail_job_postings
-  -> staging.stg_france_travail_job_postings
+France Travail API -> raw.raw_france_travail_job_postings
+Adzuna API         -> raw.raw_adzuna_job_postings
+
+raw -> staging -> warehouse -> marts
 ```
+
+The raw data is loaded by Python ingestion jobs. dbt starts after raw loading
+and builds the staging, warehouse, and mart layers.
 
 ## Source and ref rules
 
@@ -26,12 +29,14 @@ Use `source()` only for raw/external tables:
 
 ```sql
 from {{ source('raw', 'raw_france_travail_job_postings') }}
+from {{ source('raw', 'raw_adzuna_job_postings') }}
 ```
 
 Use `ref()` for dependencies between dbt models:
 
 ```sql
 from {{ ref('stg_france_travail_job_postings') }}
+from {{ ref('stg_adzuna_job_postings') }}
 ```
 
 Do not reference raw tables directly by schema/table name inside dbt models.
@@ -44,14 +49,16 @@ Install the PostgreSQL adapter:
 pip install dbt-postgres
 ```
 
-Create your local dbt profile from the committed example:
+This repository keeps a project-local dbt profile in `dbt_job_market_radar`.
+Run dbt from the repository root with both `--project-dir` and `--profiles-dir`:
 
 ```bash
-mkdir -p ~/.dbt
-cp dbt_job_market_radar/profiles.yml.example ~/.dbt/profiles.yml
+dbt debug --project-dir dbt_job_market_radar --profiles-dir dbt_job_market_radar
+dbt build --project-dir dbt_job_market_radar --profiles-dir dbt_job_market_radar
 ```
 
-The profile reads PostgreSQL settings from environment variables:
+The profile reads PostgreSQL settings from environment variables when they are
+provided:
 
 ```text
 POSTGRES_HOST
@@ -59,6 +66,24 @@ POSTGRES_PORT
 POSTGRES_DB
 POSTGRES_USER
 POSTGRES_PASSWORD
+DBT_THREADS
+```
+
+For local Windows runs against Docker Desktop, the default profile values use:
+
+```text
+POSTGRES_HOST=127.0.0.1
+POSTGRES_PORT=5433
+DBT_THREADS=1
+```
+
+Inside Docker/Airflow, `docker-compose.yml` overrides the connection to use the
+Docker service name instead:
+
+```text
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+DBT_THREADS=1
 ```
 
 ## Validation commands
@@ -66,13 +91,14 @@ POSTGRES_PASSWORD
 From the repository root:
 
 ```bash
-dbt debug --project-dir dbt_job_market_radar
-dbt parse --project-dir dbt_job_market_radar
-dbt build --project-dir dbt_job_market_radar
+dbt debug --project-dir dbt_job_market_radar --profiles-dir dbt_job_market_radar
+dbt parse --project-dir dbt_job_market_radar --profiles-dir dbt_job_market_radar
+dbt build --project-dir dbt_job_market_radar --profiles-dir dbt_job_market_radar
 ```
 
-For Task 006, `dbt parse` should succeed after installing dbt. `dbt debug` also
-requires the local PostgreSQL database to be running and accessible.
+For this local project, `threads: 1` is intentional. The pipeline is small and
+mostly linear, and single-threaded dbt runs are easier to debug and more stable
+against the local PostgreSQL container.
 
 ## Expected raw sources
 
@@ -82,4 +108,5 @@ The following raw tables must already exist in PostgreSQL:
 raw.raw_load_batches
 raw.raw_api_requests
 raw.raw_france_travail_job_postings
+raw.raw_adzuna_job_postings
 ```

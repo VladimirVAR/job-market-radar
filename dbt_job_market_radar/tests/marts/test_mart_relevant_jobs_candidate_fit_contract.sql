@@ -1,4 +1,18 @@
-select *
+select
+    canonical_job_key,
+    source_name,
+    job_title,
+    candidate_fit_score,
+    role_fit_score,
+    skill_fit_score,
+    seniority_fit_score,
+    contract_fit_score,
+    location_fit_score,
+    growth_value_score,
+    negative_signal_penalty,
+    candidate_fit_band,
+    application_priority,
+    candidate_fit_reason
 from {{ ref('mart_relevant_jobs') }}
 where candidate_fit_score < 0
    or candidate_fit_score > 100

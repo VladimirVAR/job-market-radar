@@ -1,0 +1,111 @@
+{
+  "results": [
+    {
+      "id": "ADZUNA_SAMPLE_001",
+      "title": "Data Engineer Junior",
+      "description": "Rejoignez notre équipe Data pour construire des pipelines ETL robustes. Vous travaillerez avec Python, SQL, Apache Spark et des outils cloud AWS. Expérience avec dbt et Airflow appréciée. Débutant accepté.",
+      "company": {"display_name": "Sample Data Corp"},
+      "location": {
+        "display_name": "Paris, Île-de-France",
+        "area": ["France", "Île-de-France", "Paris"]
+      },
+      "contract_type": "permanent",
+      "contract_time": "full_time",
+      "created": "2026-06-01T10:00:00Z",
+      "redirect_url": "https://www.adzuna.fr/jobs/details/ADZUNA_SAMPLE_001",
+      "salary_min": 38000,
+      "salary_max": 48000,
+      "salary_is_predicted": "0",
+      "category": {"label": "IT Jobs", "tag": "it-jobs"},
+      "adref": "eyJhbGciOiJIUzI1NiJ9.SAMPLE001",
+      "latitude": 48.8566,
+      "longitude": 2.3522
+    },
+    {
+      "id": "ADZUNA_SAMPLE_002",
+      "title": "Data Engineer Python / SQL",
+      "description": "Nous recherchons un Data Engineer pour renforcer notre équipe. Stack: Python, PostgreSQL, dbt, Airflow, GCP BigQuery. Vous serez chargé de concevoir et maintenir nos pipelines de données.",
+      "company": {"display_name": "FinTech Solutions"},
+      "location": {
+        "display_name": "Lyon, Auvergne-Rhône-Alpes",
+        "area": ["France", "Auvergne-Rhône-Alpes", "Lyon"]
+      },
+      "contract_type": "permanent",
+      "contract_time": "full_time",
+      "created": "2026-06-02T09:30:00Z",
+      "redirect_url": "https://www.adzuna.fr/jobs/details/ADZUNA_SAMPLE_002",
+      "salary_min": 42000,
+      "salary_max": 55000,
+      "salary_is_predicted": "0",
+      "category": {"label": "IT Jobs", "tag": "it-jobs"},
+      "adref": "eyJhbGciOiJIUzI1NiJ9.SAMPLE002",
+      "latitude": 45.7640,
+      "longitude": 4.8357
+    },
+    {
+      "id": "ADZUNA_SAMPLE_003",
+      "title": "Data Engineer - Remote",
+      "description": "Poste 100% télétravail. Nous construisons notre plateforme data from scratch. Technologies: Spark, Kafka, dbt, Snowflake, Python, Scala. Senior ou junior motivé, nous vous formons.",
+      "company": {"display_name": "CloudScale Analytics"},
+      "location": {
+        "display_name": "Bordeaux, Nouvelle-Aquitaine",
+        "area": ["France", "Nouvelle-Aquitaine", "Bordeaux"]
+      },
+      "contract_type": "permanent",
+      "contract_time": "full_time",
+      "created": "2026-06-03T14:00:00Z",
+      "redirect_url": "https://www.adzuna.fr/jobs/details/ADZUNA_SAMPLE_003",
+      "salary_min": 45000,
+      "salary_max": 65000,
+      "salary_is_predicted": "0",
+      "category": {"label": "IT Jobs", "tag": "it-jobs"},
+      "adref": "eyJhbGciOiJIUzI1NiJ9.SAMPLE003",
+      "latitude": 44.8378,
+      "longitude": -0.5792
+    },
+    {
+      "id": "ADZUNA_SAMPLE_004",
+      "title": "Ingénieur Data / Data Engineer",
+      "description": "Mission en freelance ou CDI. Vous interviendrez sur des projets Big Data: ingestion, transformation, modélisation. Maîtrise de AWS, Redshift, Glue, Python et SQL requise.",
+      "company": {"display_name": "DataConsult France"},
+      "location": {
+        "display_name": "Nantes, Pays de la Loire",
+        "area": ["France", "Pays de la Loire", "Nantes"]
+      },
+      "contract_type": "contract",
+      "contract_time": "full_time",
+      "created": "2026-06-04T11:15:00Z",
+      "redirect_url": "https://www.adzuna.fr/jobs/details/ADZUNA_SAMPLE_004",
+      "salary_min": 50000,
+      "salary_max": 70000,
+      "salary_is_predicted": "0",
+      "category": {"label": "IT Jobs", "tag": "it-jobs"},
+      "adref": "eyJhbGciOiJIUzI1NiJ9.SAMPLE004",
+      "latitude": 47.2184,
+      "longitude": -1.5536
+    },
+    {
+      "id": "ADZUNA_SAMPLE_005",
+      "title": "Junior Data Engineer - CDI Paris",
+      "description": "Offre pour profil junior (0-2 ans). Formation assurée. Vous travaillerez avec notre équipe data sur la mise en place d'un Data Lakehouse. Skills: Python, SQL, Spark, Azure Data Factory.",
+      "company": {"display_name": "Retail Analytics Group"},
+      "location": {
+        "display_name": "Paris, Île-de-France",
+        "area": ["France", "Île-de-France", "Paris"]
+      },
+      "contract_type": "permanent",
+      "contract_time": "full_time",
+      "created": "2026-06-05T08:45:00Z",
+      "redirect_url": "https://www.adzuna.fr/jobs/details/ADZUNA_SAMPLE_005",
+      "salary_min": 36000,
+      "salary_max": 44000,
+      "salary_is_predicted": "0",
+      "category": {"label": "IT Jobs", "tag": "it-jobs"},
+      "adref": "eyJhbGciOiJIUzI1NiJ9.SAMPLE005",
+      "latitude": 48.8566,
+      "longitude": 2.3522
+    }
+  ],
+  "count": 5,
+  "__CLASS__": "com.adzuna.api.Response"
+}

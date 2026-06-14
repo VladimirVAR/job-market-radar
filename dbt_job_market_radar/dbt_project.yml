@@ -24,6 +24,8 @@ models:
       +tags: ['staging']
       france_travail:
         +tags: ['staging', 'france_travail']
+      adzuna:
+        +tags: ['staging', 'adzuna']
     warehouse:
       +schema: warehouse
       +materialized: table
