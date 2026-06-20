@@ -448,9 +448,7 @@ Screenshots are captured from the local live-data MVP and do not include credent
 <details>
 <summary><strong>Known limitations</strong></summary>
 
-- Streamlit UI has not been verified in a browser during Phase 2 development. Code review
-  confirms that `source_name` is exposed in marts and the source filter is wired up on the
-  Relevant Jobs page, but a live browser check was not performed.
+- Streamlit was manually verified after Phase 2 validation against populated marts. The dashboard is not deployed publicly; it runs locally in the Docker/local development environment.
 - Live API modes require valid credentials for France Travail and Adzuna.
 - The local dataset size depends on API rate limits and the configured page count per source.
 - Skill extraction is rule-based and may miss synonyms or produce false positives.
