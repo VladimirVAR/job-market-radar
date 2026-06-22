@@ -90,7 +90,7 @@ class FranceTravailIngestionConfig:
     remote_values: list[str] = field(default_factory=list)
     max_pages: int = 1
     page_size: int = 50
-    sample_mode: bool = False
+    sample_mode: bool = True
     sample_file_path: str = "data/sample/france_travail_sample_response.json"
 
     @classmethod
@@ -126,7 +126,7 @@ class FranceTravailIngestionConfig:
             remote_values=_split_csv(os.getenv("FRANCE_TRAVAIL_REMOTE_VALUES")),
             max_pages=max_pages,
             page_size=page_size,
-            sample_mode=_env_bool("FRANCE_TRAVAIL_SAMPLE_MODE", False),
+            sample_mode=_env_bool("FRANCE_TRAVAIL_SAMPLE_MODE", True),
             sample_file_path=os.getenv(
                 "FRANCE_TRAVAIL_SAMPLE_FILE",
                 "data/sample/france_travail_sample_response.json",
