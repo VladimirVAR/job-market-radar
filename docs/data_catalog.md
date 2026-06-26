@@ -524,6 +524,68 @@ Shows whether dashboard data is based on a recent successful run.
 
 ---
 
+### `marts.mart_relevant_jobs_flat`
+
+**Layer:** marts
+**Grain:** one row per active relevant job posting (matching the grain of `marts.mart_relevant_jobs`).
+
+**Purpose:**
+Power BI friendly flat projection of `marts.mart_relevant_jobs`. Converts PostgreSQL ARRAY columns to
+comma-separated text for compatibility with BI tools that do not support ARRAY types natively.
+Does not change scoring or ranking logic.
+
+**Key columns:**
+
+- `canonical_job_key`
+- `job_title`
+- `company_name`
+- `source_name`
+- `candidate_fit_score`
+- `candidate_fit_band`
+- `application_priority`
+- `matched_candidate_skills`
+- `missing_growth_skills`
+- `detected_skills`
+
+**Downstream consumers:**
+
+- Power BI Relevant Jobs page
+
+---
+
+### `marts.mart_pipeline_health`
+
+**Layer:** marts
+**Grain:** one row per source_name.
+
+**Purpose:**
+Source-level pipeline health and freshness mart for BI reporting. Combines data freshness signals
+from `marts.mart_data_freshness` with batch history from `raw.raw_load_batches`. Provides
+lightweight operational visibility for the Power BI Pipeline Monitoring page.
+
+**Key columns:**
+
+- `source_name`
+- `latest_successful_batch_id`
+- `latest_successful_batch_finished_at`
+- `minutes_since_last_success`
+- `current_job_count`
+- `total_batches_all_time`
+- `successful_batches_all_time`
+- `failed_batches_all_time`
+- `running_batches_all_time`
+- `last_failed_at`
+- `freshness_status`
+- `source_health_status`
+- `monitoring_message`
+- `generated_at`
+
+**Downstream consumers:**
+
+- Power BI Pipeline Monitoring page
+
+---
+
 ## Catalog Summary
 
 The model is designed around four principles:

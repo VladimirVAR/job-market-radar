@@ -15,5 +15,9 @@ Current screenshots:
 - `streamlit_companies.png`
 - `streamlit_weekly_report.png`
 - `streamlit_data_freshness.png`
+- `powerbi_market_overview.png`
+- `powerbi_market_demand.png`
+- `powerbi_relevant_jobs.png`
+- `powerbi_pipeline_monitoring.png`
 
 These screenshots should be refreshed after meaningful UI changes or final demo-data validation runs.

@@ -1,7 +1,7 @@
 # Job Market Radar
 [![CI](https://github.com/VladimirVAR/job-market-radar/actions/workflows/ci.yml/badge.svg)](https://github.com/VladimirVAR/job-market-radar/actions/workflows/ci.yml)
 
-ELT portfolio project: collects job postings from France Travail and Adzuna APIs, transforms
+ELT pipeline: collects job postings from France Travail and Adzuna APIs, transforms
 them through PostgreSQL and dbt, orchestrates with Airflow, and presents analytics in a
 Streamlit dashboard.
 
@@ -20,6 +20,7 @@ and data freshness tracking across two live API sources.
 | Transformations | dbt |
 | Orchestration | Airflow |
 | Dashboard | Streamlit |
+| BI Reporting | Power BI |
 | Environment | Docker / Docker Compose |
 | Data modeling | SQL |
 
@@ -81,6 +82,7 @@ BigQuery, Azure, GCP, Terraform, Kubernetes, and CI/CD.
 - Data quality checks
 - Airflow orchestration
 - Streamlit dashboard reading from marts
+- Optional Power BI reporting layer connected to PostgreSQL marts for market analysis, relevant jobs review, and pipeline freshness monitoring
 - Project documentation and runbooks
 
 **Out of scope for the MVP:**
@@ -116,6 +118,7 @@ flowchart LR
     E --> F[dbt Marts]
     F --> G[Streamlit Dashboard]
     F --> H[Markdown Reports]
+    F --> K[Power BI Reporting]
     C --> I[Data Quality Checks]
     D --> I
     E --> I
@@ -226,8 +229,12 @@ Both sources support a sample mode for local demos without live API credentials.
 - `marts.mart_location_activity`
 - `marts.mart_company_activity`
 - `marts.mart_weekly_market_summary`
+- `marts.mart_relevant_jobs_flat` (Power BI friendly flat view of relevant jobs with ARRAY fields converted to text)
+- `marts.mart_pipeline_health` (source-level pipeline health and freshness mart for pipeline monitoring)
 
 See `docs/data_catalog.md` for model-level grain and field documentation.
+
+See `docs/powerbi_reporting.md` for Power BI connection details, consumed marts, dashboard pages, and local .pbix handling.
 
 </details>
 
