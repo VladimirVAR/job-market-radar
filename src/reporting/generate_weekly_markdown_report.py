@@ -48,7 +48,8 @@ def _render_markdown(row: dict[str, Any]) -> str:
     week_start = row.get("week_start_date", "unknown")
     week_end = row.get("week_end_date", "unknown")
     total = row.get("total_active_jobs", 0)
-    new_jobs = row.get("new_jobs", 0)
+    new_jobs_raw = row.get("new_jobs")
+    new_jobs = "Not available yet" if new_jobs_raw is None else new_jobs_raw
     closed = row.get("closed_or_missing_jobs", 0)
     relevant = row.get("relevant_job_count", 0)
     high_match = row.get("high_match_job_count", 0)

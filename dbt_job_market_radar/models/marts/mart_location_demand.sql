@@ -36,7 +36,9 @@ select
     avg(relevance_score) as avg_relevance_score,
     count(*) filter (where is_junior_friendly = true) as junior_friendly_job_count,
     max(last_seen_at) as last_seen_at,
-    current_timestamp as generated_at
+    current_timestamp as generated_at,
+    location_name ~ '^[0-9]+$' as is_numeric_location_code,
+    location_name = 'unknown' as is_unknown_location
 from jobs
 cross join totals t
 group by location_name

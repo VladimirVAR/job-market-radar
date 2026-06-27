@@ -29,7 +29,7 @@ if overview_df.empty:
 row = overview_df.iloc[0]
 
 metric_specs = [
-    ("Current jobs", ["total_current_job_postings", "active_job_count", "total_active_jobs"]),
+    ("Tracked jobs", ["total_current_job_postings", "active_job_count", "total_active_jobs"]),
     ("Active jobs", ["active_job_count", "total_active_jobs"]),
     ("Relevant jobs", ["relevant_job_count"]),
     ("High-match jobs", ["high_match_job_count"]),

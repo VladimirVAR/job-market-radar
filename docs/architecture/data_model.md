@@ -488,7 +488,7 @@ Provides a weekly summary of job market changes.
 | `region` | Region |
 | `city` | City |
 | `total_active_jobs` | Total active jobs |
-| `new_jobs` | New jobs |
+| `new_jobs` | Weekly new-job delta. Currently null until historical week-over-week comparison is implemented. |
 | `closed_or_missing_jobs` | Jobs no longer observed |
 | `junior_friendly_jobs` | Junior-friendly jobs |
 | `top_skills` | Top demanded skills |

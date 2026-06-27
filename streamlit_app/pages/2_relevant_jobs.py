@@ -139,7 +139,6 @@ FRIENDLY_COLUMN_LABELS = {
 }
 
 
-@st.cache_data(show_spinner=False)
 def load_relevant_jobs() -> pd.DataFrame:
     """Load dashboard-ready relevant jobs from the marts layer only."""
     return load_dataframe("select * from marts.mart_relevant_jobs")

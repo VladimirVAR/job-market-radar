@@ -44,9 +44,13 @@ metric_fields = [
     ("Avg relevance", "avg_relevance_score"),
 ]
 for container, (label, field) in zip(metric_cols, metric_fields):
-    value = latest[field] if field in df.columns else "—"
-    if isinstance(value, float):
-        value = f"{value:.1f}"
+    raw = latest[field] if field in df.columns else None
+    if raw is None or (hasattr(raw, "__class__") and raw.__class__.__name__ == "NAType") or str(raw) in ("nan", "None", "<NA>"):
+        value = "N/A"
+    elif isinstance(raw, float):
+        value = f"{raw:.1f}"
+    else:
+        value = raw
     container.metric(label, value)
 
 st.divider()

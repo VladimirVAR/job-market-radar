@@ -43,6 +43,7 @@ select
     case
         when skill_name in ('spark') then 'big_data'
         when skill_name in ('snowflake', 'bigquery') then 'warehouse'
+        when skill_name in ('azure', 'gcp') then 'cloud'
         else 'other'
     end as skill_category,
     job_count,
