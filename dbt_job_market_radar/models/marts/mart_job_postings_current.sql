@@ -14,7 +14,7 @@ with current_jobs as (
         first_seen_at,
         last_seen_at,
         coalesce(is_current_version, true) as is_active,
-	null::uuid as missing_since_batch_id,
+        missing_since_batch_id,
         job_title,
         normalized_job_title,
         company_name,
