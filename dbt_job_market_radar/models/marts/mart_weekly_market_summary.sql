@@ -46,8 +46,8 @@ top_missing_skills as (
 select
     date_trunc('week', current_date)::date as week_start_date,
     (date_trunc('week', current_date)::date + interval '6 days')::date as week_end_date,
-    o.total_current_job_postings as total_active_jobs,
-    o.total_current_job_postings as new_jobs, -- MVP simplification until historical weekly deltas are added.
+    o.active_job_count as total_active_jobs,
+    null::integer as new_jobs, -- Weekly new-job delta requires historical batch comparison; not yet implemented.
     o.inactive_job_count as closed_or_missing_jobs,
     o.relevant_job_count,
     o.high_match_job_count,
@@ -59,8 +59,8 @@ select
     coalesce(c.top_companies[1:5], array[]::text[]) as top_companies,
     false as has_enough_history,
     concat(
-        'Current market snapshot contains ', o.total_current_job_postings,
-        ' current job postings, including ', o.relevant_job_count,
+        'Current market snapshot contains ', o.active_job_count,
+        ' active job postings, including ', o.relevant_job_count,
         ' relevant jobs and ', o.junior_friendly_job_count,
         ' junior-friendly opportunities. Weekly comparison will become available after more history is collected.'
     ) as summary_text,
