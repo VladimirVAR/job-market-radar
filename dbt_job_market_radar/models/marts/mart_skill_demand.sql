@@ -38,7 +38,10 @@ skill_dictionary as (
             ('bigquery', 'warehouse', 'bigquery|big query'),
             ('data warehouse', 'warehouse', 'data[ -]?warehouse|data warehousing|(^|[^a-z0-9])dwh([^a-z0-9]|$)'),
             ('etl', 'data_engineering', '(^|[^a-z0-9])etl([^a-z0-9]|$)'),
-            ('elt', 'data_engineering', '(^|[^a-z0-9])elt([^a-z0-9]|$)')
+            ('elt', 'data_engineering', '(^|[^a-z0-9])elt([^a-z0-9]|$)'),
+            ('power_bi', 'bi', '(^|[^a-z0-9])(power\s*bi|powerbi)([^a-z0-9]|$)'),
+            ('azure', 'cloud', '(^|[^a-z0-9])azure([^a-z0-9]|$)'),
+            ('gcp', 'cloud', '(^|[^a-z0-9])gcp([^a-z0-9]|$)|google cloud')
     ) as skills(skill_name, skill_category, skill_pattern)
 
 ),

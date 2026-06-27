@@ -56,7 +56,10 @@ skill_flags as (
         (searchable_text ~* 'bigquery|big query') as has_bigquery,
         (searchable_text ~* 'data[ -]?warehouse|data warehousing|(^|[^a-z0-9])dwh([^a-z0-9]|$)') as has_data_warehouse,
         (searchable_text ~* '(^|[^a-z0-9])etl([^a-z0-9]|$)') as has_etl,
-        (searchable_text ~* '(^|[^a-z0-9])elt([^a-z0-9]|$)') as has_elt
+        (searchable_text ~* '(^|[^a-z0-9])elt([^a-z0-9]|$)') as has_elt,
+        (searchable_text ~* '(^|[^a-z0-9])(power\s*bi|powerbi)([^a-z0-9]|$)') as has_power_bi,
+        (searchable_text ~* '(^|[^a-z0-9])azure([^a-z0-9]|$)') as has_azure,
+        (searchable_text ~* '(^|[^a-z0-9])gcp([^a-z0-9]|$)|google cloud') as has_gcp
     from current_jobs
 
 ),
@@ -75,12 +78,15 @@ skill_arrays as (
             case when has_aws then 'aws' end,
             case when has_data_warehouse then 'data warehouse' end,
             case when has_etl then 'etl' end,
-            case when has_elt then 'elt' end
+            case when has_elt then 'elt' end,
+            case when has_power_bi then 'power_bi' end
         ], null) as matched_candidate_skills,
         array_remove(array[
             case when has_spark then 'spark' end,
             case when has_snowflake then 'snowflake' end,
-            case when has_bigquery then 'bigquery' end
+            case when has_bigquery then 'bigquery' end,
+            case when has_azure then 'azure' end,
+            case when has_gcp then 'gcp' end
         ], null) as missing_growth_skills,
         array_remove(array[
             case when has_python then 'python' end,
@@ -95,7 +101,10 @@ skill_arrays as (
             case when has_bigquery then 'bigquery' end,
             case when has_data_warehouse then 'data warehouse' end,
             case when has_etl then 'etl' end,
-            case when has_elt then 'elt' end
+            case when has_elt then 'elt' end,
+            case when has_power_bi then 'power_bi' end,
+            case when has_azure then 'azure' end,
+            case when has_gcp then 'gcp' end
         ], null) as detected_skills
     from skill_flags
 

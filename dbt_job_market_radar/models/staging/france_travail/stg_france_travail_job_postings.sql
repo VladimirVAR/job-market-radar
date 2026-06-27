@@ -36,23 +36,18 @@ parsed as (
             ''
         ) as location_raw,
 
-        nullif(
-            trim(
-                coalesce(
-                    raw_payload_json -> 'lieuTravail' ->> 'commune',
-                    raw_payload_json -> 'lieuTravail' ->> 'nomCommune',
-                    case
-                        when nullif(trim(raw_payload_json -> 'lieuTravail' ->> 'libelle'), '') ~ '^[0-9]{2,3}\s*-\s*'
-                            then regexp_replace(
-                                nullif(trim(raw_payload_json -> 'lieuTravail' ->> 'libelle'), ''),
-                                '^[0-9]{2,3}\s*-\s*',
-                                ''
-                            )
-                        else null
-                    end
-                )
-            ),
-            ''
+        coalesce(
+            nullif(trim(raw_payload_json -> 'lieuTravail' ->> 'nomCommune'), ''),
+            case
+                when nullif(trim(raw_payload_json -> 'lieuTravail' ->> 'libelle'), '') ~ '^[0-9]{2,3}\s*-\s*'
+                    then regexp_replace(
+                        nullif(trim(raw_payload_json -> 'lieuTravail' ->> 'libelle'), ''),
+                        '^[0-9]{2,3}\s*-\s*',
+                        ''
+                    )
+                else null
+            end,
+            nullif(trim(raw_payload_json -> 'lieuTravail' ->> 'commune'), '')
         ) as city,
 
         null::text as region,
